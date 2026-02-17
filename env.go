@@ -90,13 +90,6 @@ func MustLoad(config interface{}, opts ...Option) {
 	}
 }
 
-// load is an internal method that loads environment variables
-// Will be implemented in Phase 2
-func (v *Validator) load(config interface{}) error {
-	// TODO: Phase 2 - implement loading logic
-	return nil
-}
-
 // validate is an internal method that validates loaded values
 // Will be implemented in Phase 3
 func (v *Validator) validate(config interface{}) error {
