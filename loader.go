@@ -5,6 +5,8 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/KareemAzab21/envvalidator/internal/parser"
 )
@@ -107,6 +109,11 @@ func (v *Validator) handleMissingValue(field reflect.Value, info parser.FieldInf
 
 // setField converts a string value to the appropriate type and sets the field
 func (v *Validator) setField(field reflect.Value, value string, envName string) error {
+	// Handle time.Duration specially
+	if field.Type() == reflect.TypeOf(time.Duration(0)) {
+		return v.setDurationField(field, value)
+	}
+
 	switch field.Kind() {
 	case reflect.String:
 		field.SetString(value)
@@ -124,12 +131,15 @@ func (v *Validator) setField(field reflect.Value, value string, envName string) 
 	case reflect.Float32, reflect.Float64:
 		return v.setFloatField(field, value)
 
+	case reflect.Slice:
+		return v.setSliceField(field, value)
+
 	default:
 		return fmt.Errorf("%w: %s", ErrUnsupportedType, field.Kind())
 	}
 }
 
-// setIntField converts and sets an integer field
+// setIntField converts and sets an integer field (supports all int types)
 func (v *Validator) setIntField(field reflect.Value, value string) error {
 	bitSize := field.Type().Bits()
 	intVal, err := strconv.ParseInt(value, 10, bitSize)
@@ -137,16 +147,48 @@ func (v *Validator) setIntField(field reflect.Value, value string) error {
 		return fmt.Errorf("invalid integer value %q: %w", value, err)
 	}
 
+	// Check for overflow
+	switch field.Kind() {
+	case reflect.Int8:
+		if intVal < -128 || intVal > 127 {
+			return fmt.Errorf("value %d out of range for int8", intVal)
+		}
+	case reflect.Int16:
+		if intVal < -32768 || intVal > 32767 {
+			return fmt.Errorf("value %d out of range for int16", intVal)
+		}
+	case reflect.Int32:
+		if intVal < -2147483648 || intVal > 2147483647 {
+			return fmt.Errorf("value %d out of range for int32", intVal)
+		}
+	}
+
 	field.SetInt(intVal)
 	return nil
 }
 
-// setUintField converts and sets an unsigned integer field
+// setUintField converts and sets an unsigned integer field (supports all uint types)
 func (v *Validator) setUintField(field reflect.Value, value string) error {
 	bitSize := field.Type().Bits()
 	uintVal, err := strconv.ParseUint(value, 10, bitSize)
 	if err != nil {
 		return fmt.Errorf("invalid unsigned integer value %q: %w", value, err)
+	}
+
+	// Check for overflow
+	switch field.Kind() {
+	case reflect.Uint8:
+		if uintVal > 255 {
+			return fmt.Errorf("value %d out of range for uint8", uintVal)
+		}
+	case reflect.Uint16:
+		if uintVal > 65535 {
+			return fmt.Errorf("value %d out of range for uint16", uintVal)
+		}
+	case reflect.Uint32:
+		if uintVal > 4294967295 {
+			return fmt.Errorf("value %d out of range for uint32", uintVal)
+		}
 	}
 
 	field.SetUint(uintVal)
@@ -165,7 +207,7 @@ func (v *Validator) setBoolField(field reflect.Value, value string) error {
 	return nil
 }
 
-// setFloatField converts and sets a float field
+// setFloatField converts and sets a float field (supports float32 and float64)
 func (v *Validator) setFloatField(field reflect.Value, value string) error {
 	bitSize := field.Type().Bits()
 	floatVal, err := strconv.ParseFloat(value, bitSize)
@@ -174,5 +216,42 @@ func (v *Validator) setFloatField(field reflect.Value, value string) error {
 	}
 
 	field.SetFloat(floatVal)
+	return nil
+}
+
+// setDurationField converts and sets a time.Duration field
+// Accepts formats like: "300ms", "1.5h", "2h45m"
+func (v *Validator) setDurationField(field reflect.Value, value string) error {
+	duration, err := time.ParseDuration(value)
+	if err != nil {
+		return fmt.Errorf("invalid duration value %q: %w", value, err)
+	}
+
+	field.Set(reflect.ValueOf(duration))
+	return nil
+}
+
+// setSliceField converts and sets a slice field
+// Currently supports []string (comma-separated values)
+func (v *Validator) setSliceField(field reflect.Value, value string) error {
+	// Only support []string for now
+	if field.Type().Elem().Kind() != reflect.String {
+		return fmt.Errorf("%w: []%s", ErrUnsupportedType, field.Type().Elem().Kind())
+	}
+
+	// Handle empty string
+	if value == "" {
+		field.Set(reflect.MakeSlice(field.Type(), 0, 0))
+		return nil
+	}
+
+	// Split by comma and trim spaces
+	parts := strings.Split(value, ",")
+	slice := make([]string, len(parts))
+	for i, part := range parts {
+		slice[i] = strings.TrimSpace(part)
+	}
+
+	field.Set(reflect.ValueOf(slice))
 	return nil
 }
