@@ -1,4 +1,3 @@
-// validators/custom_test.go
 package validators
 
 import (
