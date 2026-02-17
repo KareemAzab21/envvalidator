@@ -1,4 +1,3 @@
-// internal/parser/tags.go
 package parser
 
 import (

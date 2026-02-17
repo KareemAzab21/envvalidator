@@ -1,4 +1,3 @@
-// loader_test.go
 package envvalidator
 
 import (
