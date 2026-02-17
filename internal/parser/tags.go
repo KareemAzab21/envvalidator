@@ -8,12 +8,12 @@ import (
 
 // FieldInfo contains all parsed information about a struct field
 type FieldInfo struct {
-	Name         string   // Struct field name (e.g., "Port")
-	EnvName      string   // Environment variable name (e.g., "PORT")
-	DefaultValue string   // Default value if env var not set
-	Validations  []Rule   // List of validation rules
-	Required     bool     // Whether field is required
-	HasDefault   bool     // Whether a default value is specified
+	Name         string // Struct field name (e.g., "Port")
+	EnvName      string // Environment variable name (e.g., "PORT")
+	DefaultValue string // Default value if env var not set
+	Validations  []Rule // List of validation rules
+	Required     bool   // Whether field is required
+	HasDefault   bool   // Whether a default value is specified
 }
 
 // Rule represents a single validation rule
@@ -25,7 +25,8 @@ type Rule struct {
 // ParseField extracts all tag information from a struct field
 //
 // Example struct field:
-//   Port int `env:"PORT" validate:"required,range:1000-9999" default:"8080"`
+//
+//	Port int `env:"PORT" validate:"required,range:1000-9999" default:"8080"`
 //
 // Returns FieldInfo with all parsed data
 func ParseField(field reflect.StructField) FieldInfo {
@@ -48,7 +49,7 @@ func ParseField(field reflect.StructField) FieldInfo {
 	// Parse validate tag
 	if validateTag := field.Tag.Get("validate"); validateTag != "" {
 		info.Validations = ParseValidationTag(validateTag)
-		
+
 		// Check if "required" is in validations
 		for _, rule := range info.Validations {
 			if rule.Name == "required" {
@@ -64,19 +65,20 @@ func ParseField(field reflect.StructField) FieldInfo {
 // ParseValidationTag parses a validation tag string into individual rules
 //
 // Examples:
-//   "required" → [{Name: "required", Param: ""}]
-//   "min:5,max:10" → [{Name: "min", Param: "5"}, {Name: "max", Param: "10"}]
-//   "range:1000-9999" → [{Name: "range", Param: "1000-9999"}]
+//
+//	"required" → [{Name: "required", Param: ""}]
+//	"min:5,max:10" → [{Name: "min", Param: "5"}, {Name: "max", Param: "10"}]
+//	"range:1000-9999" → [{Name: "range", Param: "1000-9999"}]
 func ParseValidationTag(tag string) []Rule {
 	if tag == "" {
 		return []Rule{}
 	}
 
 	var rules []Rule
-	
+
 	// Split by comma to get individual rules
 	parts := strings.Split(tag, ",")
-	
+
 	for _, part := range parts {
 		part = strings.TrimSpace(part)
 		if part == "" {
@@ -93,13 +95,14 @@ func ParseValidationTag(tag string) []Rule {
 // ParseRule parses a single validation rule
 //
 // Examples:
-//   "required" → Rule{Name: "required", Param: ""}
-//   "min:5" → Rule{Name: "min", Param: "5"}
-//   "range:1000-9999" → Rule{Name: "range", Param: "1000-9999"}
+//
+//	"required" → Rule{Name: "required", Param: ""}
+//	"min:5" → Rule{Name: "min", Param: "5"}
+//	"range:1000-9999" → Rule{Name: "range", Param: "1000-9999"}
 func ParseRule(ruleStr string) Rule {
 	// Check if rule has a parameter (contains ":")
 	colonIdx := strings.Index(ruleStr, ":")
-	
+
 	if colonIdx == -1 {
 		// No parameter (e.g., "required")
 		return Rule{
