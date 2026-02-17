@@ -89,10 +89,3 @@ func MustLoad(config interface{}, opts ...Option) {
 		panic(fmt.Sprintf("envvalidator: failed to load config: %v", err))
 	}
 }
-
-// validate is an internal method that validates loaded values
-// Will be implemented in Phase 3
-func (v *Validator) validate(config interface{}) error {
-	// TODO: Phase 3 - implement validation logic
-	return nil
-}
