@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"testing"
+	"time"
 )
 
 // Helper function to set and clean up environment variables
@@ -811,4 +812,500 @@ func TestCombinedOptions(t *testing.T) {
 	if cfg.Host != "localhost" {
 		t.Errorf("expected 'localhost', got %q", cfg.Host)
 	}
+}
+
+func TestAdvancedTypes(t *testing.T) {
+	t.Run("int8 type", func(t *testing.T) {
+		type Config struct {
+			Value int8 `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "127")
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Value != 127 {
+			t.Errorf("expected 127, got %d", cfg.Value)
+		}
+	})
+
+	t.Run("int8 overflow", func(t *testing.T) {
+		type Config struct {
+			Value int8 `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "128") // Out of range for int8
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err == nil {
+			t.Fatal("expected error for int8 overflow")
+		}
+	})
+
+	t.Run("int16 type", func(t *testing.T) {
+		type Config struct {
+			Value int16 `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "32767")
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Value != 32767 {
+			t.Errorf("expected 32767, got %d", cfg.Value)
+		}
+	})
+
+	t.Run("int32 type", func(t *testing.T) {
+		type Config struct {
+			Value int32 `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "2147483647")
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Value != 2147483647 {
+			t.Errorf("expected 2147483647, got %d", cfg.Value)
+		}
+	})
+
+	t.Run("int64 type", func(t *testing.T) {
+		type Config struct {
+			Value int64 `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "9223372036854775807")
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Value != 9223372036854775807 {
+			t.Errorf("expected 9223372036854775807, got %d", cfg.Value)
+		}
+	})
+
+	t.Run("uint type", func(t *testing.T) {
+		type Config struct {
+			Value uint `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "42")
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Value != 42 {
+			t.Errorf("expected 42, got %d", cfg.Value)
+		}
+	})
+
+	t.Run("uint8 type", func(t *testing.T) {
+		type Config struct {
+			Value uint8 `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "255")
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Value != 255 {
+			t.Errorf("expected 255, got %d", cfg.Value)
+		}
+	})
+
+	t.Run("uint16 type", func(t *testing.T) {
+		type Config struct {
+			Value uint16 `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "65535")
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Value != 65535 {
+			t.Errorf("expected 65535, got %d", cfg.Value)
+		}
+	})
+
+	t.Run("uint32 type", func(t *testing.T) {
+		type Config struct {
+			Value uint32 `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "4294967295")
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Value != 4294967295 {
+			t.Errorf("expected 4294967295, got %d", cfg.Value)
+		}
+	})
+
+	t.Run("uint64 type", func(t *testing.T) {
+		type Config struct {
+			Value uint64 `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "18446744073709551615")
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Value != 18446744073709551615 {
+			t.Errorf("expected 18446744073709551615, got %d", cfg.Value)
+		}
+	})
+
+	t.Run("uint8 overflow", func(t *testing.T) {
+		type Config struct {
+			Value uint8 `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "256") // Out of range for uint8
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err == nil {
+			t.Fatal("expected error for uint8 overflow")
+		}
+	})
+
+	t.Run("float32 type", func(t *testing.T) {
+		type Config struct {
+			Value float32 `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "3.14")
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Value != 3.14 {
+			t.Errorf("expected 3.14, got %f", cfg.Value)
+		}
+	})
+
+	t.Run("float64 type", func(t *testing.T) {
+		type Config struct {
+			Value float64 `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "3.141592653589793")
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Value != 3.141592653589793 {
+			t.Errorf("expected 3.141592653589793, got %f", cfg.Value)
+		}
+	})
+
+	t.Run("time.Duration type", func(t *testing.T) {
+		type Config struct {
+			Timeout time.Duration `env:"TIMEOUT"`
+		}
+
+		os.Setenv("TIMEOUT", "5s")
+		defer os.Unsetenv("TIMEOUT")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Timeout != 5*time.Second {
+			t.Errorf("expected 5s, got %v", cfg.Timeout)
+		}
+	})
+
+	t.Run("time.Duration with milliseconds", func(t *testing.T) {
+		type Config struct {
+			Timeout time.Duration `env:"TIMEOUT"`
+		}
+
+		os.Setenv("TIMEOUT", "500ms")
+		defer os.Unsetenv("TIMEOUT")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Timeout != 500*time.Millisecond {
+			t.Errorf("expected 500ms, got %v", cfg.Timeout)
+		}
+	})
+
+	t.Run("time.Duration with hours", func(t *testing.T) {
+		type Config struct {
+			Timeout time.Duration `env:"TIMEOUT"`
+		}
+
+		os.Setenv("TIMEOUT", "2h30m")
+		defer os.Unsetenv("TIMEOUT")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		expected := 2*time.Hour + 30*time.Minute
+		if cfg.Timeout != expected {
+			t.Errorf("expected %v, got %v", expected, cfg.Timeout)
+		}
+	})
+
+	t.Run("time.Duration invalid format", func(t *testing.T) {
+		type Config struct {
+			Timeout time.Duration `env:"TIMEOUT"`
+		}
+
+		os.Setenv("TIMEOUT", "invalid")
+		defer os.Unsetenv("TIMEOUT")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err == nil {
+			t.Fatal("expected error for invalid duration format")
+		}
+	})
+
+	t.Run("[]string type - comma separated", func(t *testing.T) {
+		type Config struct {
+			Tags []string `env:"TAGS"`
+		}
+
+		os.Setenv("TAGS", "tag1,tag2,tag3")
+		defer os.Unsetenv("TAGS")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		expected := []string{"tag1", "tag2", "tag3"}
+		if len(cfg.Tags) != len(expected) {
+			t.Fatalf("expected %d tags, got %d", len(expected), len(cfg.Tags))
+		}
+
+		for i, tag := range cfg.Tags {
+			if tag != expected[i] {
+				t.Errorf("expected tag[%d] = %q, got %q", i, expected[i], tag)
+			}
+		}
+	})
+
+	t.Run("[]string type - with spaces", func(t *testing.T) {
+		type Config struct {
+			Tags []string `env:"TAGS"`
+		}
+
+		os.Setenv("TAGS", "tag1, tag2 , tag3")
+		defer os.Unsetenv("TAGS")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		expected := []string{"tag1", "tag2", "tag3"}
+		if len(cfg.Tags) != len(expected) {
+			t.Fatalf("expected %d tags, got %d", len(expected), len(cfg.Tags))
+		}
+
+		for i, tag := range cfg.Tags {
+			if tag != expected[i] {
+				t.Errorf("expected tag[%d] = %q, got %q", i, expected[i], tag)
+			}
+		}
+	})
+
+	t.Run("[]string type - empty string", func(t *testing.T) {
+		type Config struct {
+			Tags []string `env:"TAGS"`
+		}
+
+		os.Setenv("TAGS", "")
+		defer os.Unsetenv("TAGS")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if len(cfg.Tags) != 0 {
+			t.Errorf("expected empty slice, got %v", cfg.Tags)
+		}
+	})
+
+	t.Run("[]string type - single value", func(t *testing.T) {
+		type Config struct {
+			Tags []string `env:"TAGS"`
+		}
+
+		os.Setenv("TAGS", "single")
+		defer os.Unsetenv("TAGS")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if len(cfg.Tags) != 1 || cfg.Tags[0] != "single" {
+			t.Errorf("expected [single], got %v", cfg.Tags)
+		}
+	})
+
+	t.Run("negative int values", func(t *testing.T) {
+		type Config struct {
+			Value int `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "-42")
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Value != -42 {
+			t.Errorf("expected -42, got %d", cfg.Value)
+		}
+	})
+
+	t.Run("negative float values", func(t *testing.T) {
+		type Config struct {
+			Value float64 `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "-3.14")
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.Value != -3.14 {
+			t.Errorf("expected -3.14, got %f", cfg.Value)
+		}
+	})
+
+	t.Run("scientific notation float", func(t *testing.T) {
+		type Config struct {
+			Value float64 `env:"VALUE"`
+		}
+
+		os.Setenv("VALUE", "1.23e10")
+		defer os.Unsetenv("VALUE")
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		expected := 1.23e10
+		if cfg.Value != expected {
+			t.Errorf("expected %e, got %e", expected, cfg.Value)
+		}
+	})
+
+	t.Run("zero values", func(t *testing.T) {
+		type Config struct {
+			IntVal   int     `env:"INT_VAL"`
+			FloatVal float64 `env:"FLOAT_VAL"`
+			BoolVal  bool    `env:"BOOL_VAL"`
+		}
+
+		os.Setenv("INT_VAL", "0")
+		os.Setenv("FLOAT_VAL", "0.0")
+		os.Setenv("BOOL_VAL", "false")
+		defer func() {
+			os.Unsetenv("INT_VAL")
+			os.Unsetenv("FLOAT_VAL")
+			os.Unsetenv("BOOL_VAL")
+		}()
+
+		var cfg Config
+		err := Load(&cfg)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if cfg.IntVal != 0 {
+			t.Errorf("expected 0, got %d", cfg.IntVal)
+		}
+		if cfg.FloatVal != 0.0 {
+			t.Errorf("expected 0.0, got %f", cfg.FloatVal)
+		}
+		if cfg.BoolVal != false {
+			t.Errorf("expected false, got %v", cfg.BoolVal)
+		}
+	})
+
 }
