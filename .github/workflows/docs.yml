@@ -28,5 +28,5 @@ jobs:
 
       - name: Check godoc
         run: |
-          go install github.com/golang/tools/cmd/goimports@latest
+          go install golang.org/x/tools/cmd/goimports@latest
           goimports -w .
