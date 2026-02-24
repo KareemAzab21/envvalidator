@@ -27,15 +27,21 @@ jobs:
       - name: Cache Go modules
         uses: actions/cache@v4
         with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-go-
+            ${{ runner.os }}-go-${{ matrix.go-version }}-
 
       - name: Download dependencies
         run: go mod download
 
       - name: Run tests
+        run: go test -v ./...
+
+      - name: Run tests with coverage (Linux only)
+        if: runner.os == 'Linux'
         run: go test -v -coverprofile=coverage.out ./...
       
       - name: Run tests with race detector (Linux only)
