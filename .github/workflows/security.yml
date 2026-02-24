@@ -12,6 +12,8 @@ jobs:
   gosec:
     name: Gosec Security Scanner
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
     
     steps:
       - name: Checkout code
@@ -23,7 +25,7 @@ jobs:
           args: '-no-fail -fmt sarif -out gosec-results.sarif ./...'
 
       - name: Upload Gosec results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: gosec-results.sarif
@@ -43,5 +45,5 @@ jobs:
 
       - name: Check for vulnerabilities
         run: |
-          go install github.com/golang/vuln/cmd/govulncheck@latest
+          go install golang.org/x/vuln/cmd/govulncheck@latest
           govulncheck ./...
