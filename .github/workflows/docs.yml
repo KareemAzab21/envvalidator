@@ -1,0 +1,32 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  docs:
+    name: Check Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Verify examples build
+        run: |
+          cd examples/basic && go build -v && cd ../..
+          cd examples/advanced && go build -v && cd ../..
+          cd examples/custom-validator && go build -v && cd ../..
+
+      - name: Check godoc
+        run: |
+          go install github.com/golang/tools/cmd/goimports@latest
+          goimports -w .
