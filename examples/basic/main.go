@@ -20,7 +20,7 @@ type Config struct {
 }
 
 func main() {
-	fmt.Println("=== EnvValidator Basic Example ===\n")
+	fmt.Println("=== EnvValidator Basic Example ===")
 
 	// Create a config instance
 	var cfg Config

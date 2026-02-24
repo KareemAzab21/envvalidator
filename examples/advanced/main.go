@@ -47,7 +47,7 @@ type ServerConfig struct {
 }
 
 func main() {
-	fmt.Println("=== EnvValidator Advanced Example ===\n")
+	fmt.Println("=== EnvValidator Advanced Example ===")
 
 	var cfg ServerConfig
 
@@ -74,7 +74,7 @@ func main() {
 	}
 
 	// Print the loaded configuration
-	fmt.Println("✅ Configuration loaded successfully!\n")
+	fmt.Println("✅ Configuration loaded successfully!")
 
 	fmt.Println("Server Configuration:")
 	fmt.Printf("  Host:          %s\n", cfg.Host)

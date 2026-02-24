@@ -33,7 +33,7 @@ type Config struct {
 }
 
 func main() {
-	fmt.Println("=== EnvValidator Custom Validator Example ===\n")
+	fmt.Println("=== EnvValidator Custom Validator Example ===")
 
 	// Register custom validators
 	customValidators := map[string]validators.ValidatorFunc{
@@ -172,7 +172,7 @@ func main() {
 	)
 
 	if err != nil {
-		fmt.Println("❌ Validation errors found:\n")
+		fmt.Println("❌ Validation errors found:")
 
 		var validationErrs envvalidator.ValidationErrors
 		if errors.As(err, &validationErrs) {
@@ -189,7 +189,7 @@ func main() {
 	}
 
 	// Print the loaded configuration
-	fmt.Println("✅ Configuration loaded and validated successfully!\n")
+	fmt.Println("✅ Configuration loaded and validated successfully!")
 
 	fmt.Println("Configuration:")
 	fmt.Printf("  Username:     %s\n", cfg.Username)
@@ -214,9 +214,9 @@ func main() {
 	fmt.Println("\n💡 Try modifying the environment variables to see validation in action!")
 }
 
-// printUsageInstructions prints instructions for running the example
+// printUsageInstructions prints instructions for running the example  
 func printUsageInstructions() {
-	fmt.Println("\n💡 To run this example successfully, set these environment variables:\n")
+	fmt.Println("\n💡 To run this example successfully, set these environment variables:")
 
 	fmt.Println("Required variables:")
 	fmt.Println("  export USERNAME=\"john123\"")
