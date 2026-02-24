@@ -214,7 +214,7 @@ func main() {
 	fmt.Println("\n💡 Try modifying the environment variables to see validation in action!")
 }
 
-// printUsageInstructions prints instructions for running the example  
+// printUsageInstructions prints instructions for running the example
 func printUsageInstructions() {
 	fmt.Println("\n💡 To run this example successfully, set these environment variables:")
 
